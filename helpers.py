@@ -1,5 +1,6 @@
 import subprocess
 import re
+import json
 
 class Video:
     def __init__(self, elem, url):
@@ -10,7 +11,8 @@ class Video:
 
     def get_metadata(self):
         proc = subprocess.run(['./youtube-dl', '-J', self.url], stdout=subprocess.PIPE)
-        self.metadata = proc.stdout.decode()
+        self.metadata = json.loads(proc.stdout.decode())
+
 
 class VideoUnavailableException(Exception):
     pass
