@@ -5,9 +5,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import WebDriverException
 from time import sleep
-from helpers import Video, VideoUnavailableException, time2seconds
+from .helpers import Video, VideoUnavailableException, time2seconds
 from pyvirtualdisplay import Display
-
 
 class YTDriver:
 
@@ -100,7 +99,7 @@ class YTDriver:
         return results
 
 
-    def play_video(self, video, duration=5):
+    def play(self, video, duration=5):
         # this function returns when the video starts playing
         try:
             self.__click_video(video)
@@ -128,7 +127,6 @@ class YTDriver:
                 video.elem.click()
                 return
             except Exception as e:
-                print(e)
                 try:
                     # try to click the element using javascript
                     self.__log("Failed. Clicking via Javascript...")

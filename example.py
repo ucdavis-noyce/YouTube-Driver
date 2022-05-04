@@ -1,4 +1,4 @@
-from YTDriver import YTDriver
+from ytdriver.YTDriver import YTDriver
 
 # load the driver
 driver = YTDriver(browser='firefox', verbose=True)
