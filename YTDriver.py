@@ -5,23 +5,19 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import WebDriverException
 from time import sleep
-import re
-import requests
 from helpers import Video, VideoUnavailableException, time2seconds
 from pyvirtualdisplay import Display
-import subprocess
 
-
-   
 
 class YTDriver:
 
     def __init__(self, browser='chrome', profile_dir=None, use_virtual_display=False, headless=False, verbose=False):
 
         if use_virtual_display:
-            print("Launching virtual display")
-            Display(size=(1920,1080)).start()
-            print("Virtual display launched")
+            self.__log("Launching virtual display")
+            display = Display(size=(1920,1080))
+            display.start()
+            self.__log("Virtual display launched")
 
         if browser == 'chrome':
             self.driver = self.__init_chrome(profile_dir, headless)
@@ -39,24 +35,26 @@ class YTDriver:
     def get_homepage(self, scroll_times=0):
         # try to find the youtube icon
         try:
-            print('clicking yt icon')
+            self.__log('Clicking homepage icon')
             self.driver.find_element(By.ID, 'logo-icon').click()
         except:
-            print('getting via url')
+            self.__log('Getting homepage via URL')
             self.driver.get('https://www.youtube.com')
-            
-        homepage = []
-        sleep(5)
+
+        # wait for page to load
+        sleep(2)
 
         # scroll page to load more results
         for _ in range(scroll_times):
             self.driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.PAGE_DOWN)
             sleep(0.2)
+            
 
         # collect video-like tags from homepage
         videos = self.driver.find_elements(By.XPATH, '//div[@id="contents"]/ytd-rich-item-renderer')
 
         # identify actual videos from tags
+        homepage = []
         for video in videos:
             a = video.find_elements(By.TAG_NAME, 'a')[0]
             href = a.get_attribute('href')
@@ -64,7 +62,44 @@ class YTDriver:
                 homepage.append(Video(a, href))
 
         return homepage
-    
+
+    def get_recommendations(self, topn=5):
+        # wait for page to load
+        sleep(2)
+
+        # wait for recommendations
+        elems = WebDriverWait(self.driver, 30).until(
+            EC.presence_of_all_elements_located((By.TAG_NAME, 'ytd-compact-video-renderer'))
+        )
+
+        # recommended videos array
+        return [Video(elem, elem.find_elements(By.TAG_NAME, 'a')[0].get_attribute('href')) for elem in elems[:topn]]
+
+    def search_videos(self, query, scroll_times=0):
+        # load video search results
+        self.driver.get('https://www.youtube.com/results?search_query=%s' % query)
+
+        # wait for page to load
+        sleep(2)
+
+        # scroll page to load more results
+        for _ in range(scroll_times):
+            self.driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.PAGE_DOWN)
+            sleep(0.2)
+
+        # collect video-like tags from homepage
+        videos = self.driver.find_elements(By.XPATH, '//div[@id="contents"]/ytd-video-renderer')
+        
+        # identify actual videos from tags
+        results = []
+        for video in videos:
+            a = video.find_elements(By.TAG_NAME, 'a')[0]
+            href = a.get_attribute('href')
+            if href is not None and href.startswith('https://www.youtube.com/watch?'):
+                results.append(Video(a, href))
+        return results
+
+
     def play_video(self, video, duration=5):
         # this function returns when the video starts playing
         try:
@@ -77,44 +112,10 @@ class YTDriver:
         except WebDriverException as e:
             self.__log(e)
 
-    def get_recommendations(self, topn=5):
-        sleep(5)
-
-        # wait for recommendations to appear
-        elems = WebDriverWait(self.driver, 30).until(
-            EC.presence_of_all_elements_located((By.TAG_NAME, 'ytd-compact-video-renderer'))
-        )
-
-        # recommended videos array
-        return [Video(elem, elem.find_elements(By.TAG_NAME, 'a')[0].get_attribute('href')) for elem in elems[:topn]]
-
-    def search_videos(self, query, scroll_times=0):
-        # load video search results
-        self.driver.get('https://www.youtube.com/results?search_query=%s' % query)
-
-        # scroll page to load more results
-        for _ in range(scroll_times):
-            self.driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.PAGE_DOWN)
-            sleep(0.2)
-
-        results = []
-        sleep(5)
-
-        # collect video-like tags from homepage
-        videos = self.driver.find_elements(By.XPATH, '//div[@id="contents"]/ytd-video-renderer')
-
-        # identify actual videos from tags
-        for video in videos:
-            a = video.find_elements(By.TAG_NAME, 'a')[0]
-            href = a.get_attribute('href')
-            if href is not None and href.startswith('https://www.youtube.com/watch?'):
-                results.append(Video(a, href))
-        return results
-
     def save_screenshot(self, filename):
         return self.driver.save_screenshot(filename)
 
-    ## helper methods
+    ## Helpers
     def __log(self, message):
         if self.verbose:
             print(message)
