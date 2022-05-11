@@ -16,10 +16,9 @@ class YTDriver:
         self.verbose = verbose
 
         if use_virtual_display:
-            self.__log("Launching virtual display")
+            self.__log("Starting virtual display")
             display = Display(size=(1920,1080))
             display.start()
-            self.__log("Virtual display launched")
 
         if browser == 'chrome':
             self.driver = self.__init_chrome(profile_dir, headless)
