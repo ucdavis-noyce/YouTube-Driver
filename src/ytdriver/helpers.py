@@ -7,11 +7,13 @@ class Video:
         self.elem = elem
         self.url = url
         self.videoId = re.search(r'\?v=(.*)?$', url).group(1).split('&')[0]
-        self.metadata = {}
+        self.metadata = None
 
     def get_metadata(self):
-        proc = subprocess.run(['./youtube-dl', '-J', self.url], stdout=subprocess.PIPE)
-        self.metadata = json.loads(proc.stdout.decode())
+        if self.metadata is None:
+            proc = subprocess.run(['./youtube-dl', '-J', self.url], stdout=subprocess.PIPE)
+            self.metadata = json.loads(proc.stdout.decode())
+        return self.metadata
 
 
 class VideoUnavailableException(Exception):
