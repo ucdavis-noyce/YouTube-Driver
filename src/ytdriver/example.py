@@ -1,19 +1,22 @@
-from ytdriver.YTDriver import YTDriver
+from ytdriver import YTDriver
 
-# load the driver
+# initialize the driver
 driver = YTDriver(browser='firefox', verbose=True)
 
-# get youtube homepage
-videos = driver.get_homepage() * 10
+# get videos from the youtube homepage
+videos = driver.get_homepage()
 
-driver.play_video(videos[0], 0)
+# play the top video from the homepage for 30 seconds
+driver.play_video(videos[0], 30)
 
+# get up-next video recommendations
 for video in driver.get_recommendations():
-  video.get_metadata()
-  print(video.metadata['title'])
+  metadata = video.get_metadata()
+  print(metadata['title'])
 
+# search for a keyword
 for video in driver.search_videos('sports'):
-  print(video.url)  
+  print(video.url)
   
 # close driver
 driver.close()
