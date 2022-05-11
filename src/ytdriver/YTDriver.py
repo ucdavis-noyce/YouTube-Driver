@@ -12,6 +12,16 @@ import os
 class YTDriver:
 
     def __init__(self, browser='chrome', profile_dir=None, use_virtual_display=False, headless=False, verbose=False):
+        """
+        Initializes the webdriver and virtual display
+
+        ### Arguments:
+        - `browser`: Specify `chrome` or `firefox` to launch the corresponding webdriver.
+        - `profile_dir`: Specify a directory to save the browser profile so it can be loaded later. Set to `None` to not save the profile.
+        - `use_virtual_display`: Set to `True` to launch a virtual display using `pyvirtualdisplay`.
+        - `headless`: Set to `True` to run the browser in headless mode.
+        - `verbose`: Set to `True` to enable logging messages.
+        """
 
         self.verbose = verbose
 
@@ -30,9 +40,22 @@ class YTDriver:
         self.driver.set_page_load_timeout(30)
 
     def close(self):
+        """
+        Close the underlying webdriver.
+        """
         self.driver.close()
 
     def get_homepage(self, scroll_times=0):
+        """
+        Collect videos from the YouTube homepage.
+
+        ### Arguments:
+        - `scroll_times`: Number of times to scroll the homepage.
+
+        ### Returns:
+        - List of videos of type `ytdriver.Video`.
+
+        """
         # try to find the youtube icon
         try:
             self.__log('Clicking homepage icon')
@@ -64,6 +87,17 @@ class YTDriver:
         return homepage
 
     def get_recommendations(self, topn=5):
+
+        """
+        Collect up-next recommendations for the currently playing video.
+
+        ### Arguments:
+        - `topn`: Number of recommendations to return.
+
+        ### Returns:
+        - List of videos of type `ytdriver.Video`.
+        
+        """
         # wait for page to load
         sleep(2)
 
@@ -76,6 +110,17 @@ class YTDriver:
         return [Video(elem, elem.find_elements(By.TAG_NAME, 'a')[0].get_attribute('href')) for elem in elems[:topn]]
 
     def search_videos(self, query, scroll_times=0):
+        """
+        Search for videos.
+
+        ### Arguments:
+        - `query` (`str`): Search query.
+
+        ### Returns:
+        - List of videos of type `ytdriver.Video`.
+        
+        """
+
         # load video search results
         self.driver.get('https://www.youtube.com/results?search_query=%s' % query)
 
@@ -101,7 +146,14 @@ class YTDriver:
 
 
     def play(self, video, duration=5):
-        # this function returns when the video starts playing
+        """
+        Play a video for a set duration. Returns when that duration passes.
+
+        ### Arguments:
+        - `video` (`str`|`ytdriver.Video`): Video object or URL to play.
+        - `duration` (`int`): How long to play the video.
+        
+        """
         try:
             self.__click_video(video)
             self.__check_video_availability()
@@ -113,6 +165,12 @@ class YTDriver:
             self.__log(e)
 
     def save_screenshot(self, filename):
+        """
+        Save a screenshot of the current browser window.
+
+        ### Arguments:
+        - `filename`: Filename to save image as.
+        """
         return self.driver.save_screenshot(filename)
 
     ## Helpers
