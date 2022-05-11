@@ -1,4 +1,5 @@
 from selenium.webdriver import Chrome, ChromeOptions, Firefox, FirefoxOptions
+from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
@@ -284,6 +285,7 @@ class YTDriver:
         if headless:
             options.add_argument('--headless')
 
-        return Firefox(options=options, service_log_path=os.path.devnull)
+        service = Service(log_path=os.path.devnull)
+        return Firefox(options=options, service=service)
 
 
