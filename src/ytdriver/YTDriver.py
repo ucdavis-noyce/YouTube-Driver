@@ -12,6 +12,8 @@ class YTDriver:
 
     def __init__(self, browser='chrome', profile_dir=None, use_virtual_display=False, headless=False, verbose=False):
 
+        self.verbose = verbose
+
         if use_virtual_display:
             self.__log("Launching virtual display")
             display = Display(size=(1920,1080))
@@ -26,7 +28,6 @@ class YTDriver:
             raise Exception("Invalid browser", browser)
 
         self.driver.set_page_load_timeout(30)
-        self.verbose = verbose
 
     def close(self):
         self.driver.close()
@@ -142,7 +143,9 @@ class YTDriver:
 
     def __check_video_availability(self):
         try:
-            self.driver.find_element(By.XPATH, '//*[@id="container"]/h1')
+            WebDriverWait(self.driver, 5).until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="container"]/h1'))
+            )
         except WebDriverException:
             raise VideoUnavailableException()
 
@@ -224,4 +227,5 @@ class YTDriver:
             options.add_argument('--headless')
 
         return Firefox(options=options)
+
 
