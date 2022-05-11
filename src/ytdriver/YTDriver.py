@@ -54,7 +54,7 @@ class YTDriver:
         - `scroll_times`: Number of times to scroll the homepage.
 
         ### Returns:
-        - List of videos of type `ytdriver.Video`.
+        - List of videos of type `ytdriver.helpers.Video`.
 
         """
         # try to find the youtube icon
@@ -96,7 +96,7 @@ class YTDriver:
         - `topn`: Number of recommendations to return.
 
         ### Returns:
-        - List of videos of type `ytdriver.Video`.
+        - List of videos of type `ytdriver.helpers.Video`.
         
         """
         # wait for page to load
@@ -118,7 +118,7 @@ class YTDriver:
         - `query` (`str`): Search query.
 
         ### Returns:
-        - List of videos of type `ytdriver.Video`.
+        - List of videos of type `ytdriver.helpers.Video`.
         
         """
 
@@ -151,7 +151,7 @@ class YTDriver:
         Play a video for a set duration. Returns when that duration passes.
 
         ### Arguments:
-        - `video` (`str`|`ytdriver.Video`): Video object or URL to play.
+        - `video` (`str`|`ytdriver.helpers.Video`): Video object or URL to play.
         - `duration` (`int`): How long to play the video.
         
         """
