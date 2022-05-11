@@ -10,6 +10,9 @@ class Video:
         self.metadata = None
 
     def get_metadata(self):
+        """
+        Get video metadata using `youtube-dl`.
+        """
         if self.metadata is None:
             proc = subprocess.run(['./youtube-dl', '-J', self.url], stdout=subprocess.PIPE)
             self.metadata = json.loads(proc.stdout.decode())
@@ -17,10 +20,16 @@ class Video:
 
 
 class VideoUnavailableException(Exception):
+    """
+    Exception thrown when a played video is private/deleted/copyright struck.
+    """
     pass
 
 
 def time2seconds(s):
+    """
+    Converts a given time (video duration, ad time, etc.) to seconds
+    """
     s = s.split(':')
     s.reverse()
     wait = 0
