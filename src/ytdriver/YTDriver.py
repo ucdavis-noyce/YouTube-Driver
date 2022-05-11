@@ -7,6 +7,7 @@ from selenium.common.exceptions import WebDriverException
 from time import sleep
 from .helpers import Video, VideoUnavailableException, time2seconds
 from pyvirtualdisplay import Display
+import os
 
 class YTDriver:
 
@@ -226,6 +227,6 @@ class YTDriver:
         if headless:
             options.add_argument('--headless')
 
-        return Firefox(options=options)
+        return Firefox(options=options, service_log_path=os.path.devnull)
 
 
