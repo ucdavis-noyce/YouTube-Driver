@@ -15,7 +15,7 @@ driver = YTDriver(browser='firefox', verbose=True)
 videos = driver.get_homepage()
 
 # play the top video from the homepage for 30 seconds
-driver.play_video(videos[0], 30)
+driver.play(videos[0], 30)
 
 # get up-next video recommendations
 for video in driver.get_recommendations():
