@@ -14,7 +14,7 @@ class Video:
         Get video metadata using `youtube-dl`.
         """
         if self.metadata is None:
-            proc = subprocess.run(['./youtube-dl', '-J', self.url], stdout=subprocess.PIPE)
+            proc = subprocess.run(['youtube-dl', '-J', self.url], stdout=subprocess.PIPE)
             self.metadata = json.loads(proc.stdout.decode())
         return self.metadata
 
