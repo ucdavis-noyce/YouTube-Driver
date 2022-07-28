@@ -6,7 +6,7 @@ class Video:
     def __init__(self, elem, url):
         self.elem = elem
         self.url = url
-        self.videoId = re.search(r'\?v=(.*)?$', url).group(1).split('&')[0]
+        self.videoId = re.search(r'[?&]v=(.*)?$', url).group(1).split('&')[0]
         self.metadata = None
 
     def get_metadata(self):
