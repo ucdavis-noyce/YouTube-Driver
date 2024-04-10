@@ -219,12 +219,13 @@ class YTDriver:
     def __handle_ads(self):
         # handle multiple ads
         while True:
-            sleep(1)
+            sleep(2)
 
             # check if ad is being shown
             preview = self.driver.find_elements(By.CLASS_NAME, 'ytp-ad-preview-container')
             if len(preview) == 0:
                 self.__log('Ad not detected')
+                input()
                 # ad is not shown, return
                 return
 
@@ -236,7 +237,7 @@ class YTDriver:
             # grab preview text to determine ad type
             text = preview.text.replace('\n', ' ')
             wait = 0
-            if 'after ad' in text:
+            if 'after ad' in text or 'plays soon' in text:
                 # unskippable ad, grab ad length
                 length = self.driver.find_elements(By.CLASS_NAME, 'ytp-ad-duration-remaining')[0].text
                 wait = time2seconds(length)
