@@ -5,11 +5,9 @@ if __name__ == '__main__':
   # initialize the driver
   driver = YTDriver(browser='chrome', verbose=True)
 
-  input()
   # search for a keyword
   for video in driver.search_videos('sports')[:1]:
     driver.play(video)
-    input()
 
   # get upnext
   for _ in range(3):
