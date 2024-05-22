@@ -6,11 +6,17 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import WebDriverException
 from time import sleep
-from .helpers import Video, VideoUnavailableException, time2seconds
+from .Video import Video, VideoUnavailableException
+from .util import time2seconds
 from pyvirtualdisplay import Display
 import os
 
 class YTDriver:
+
+    AD_CLASSNAMES = [
+        'ytp-preview-ad',
+        'ytp-ad-preview-container'
+    ]
 
     def __init__(self, browser='chrome', profile_dir=None, use_virtual_display=False, headless=False, verbose=False):
         """
@@ -46,7 +52,7 @@ class YTDriver:
         """
         self.driver.close()
 
-    def get_homepage(self, scroll_times=0):
+    def get_homepage_recommendations(self, scroll_times=0) -> list[Video]:
         """
         Collect videos from the YouTube homepage.
 
@@ -87,7 +93,7 @@ class YTDriver:
 
         return homepage
 
-    def get_recommendations(self, topn=5):
+    def get_upnext_recommendations(self, topn=5) -> list[Video]:
 
         """
         Collect up-next recommendations for the currently playing video.
@@ -110,7 +116,7 @@ class YTDriver:
         # recommended videos array
         return [Video(elem, elem.find_elements(By.TAG_NAME, 'a')[0].get_attribute('href')) for elem in elems[:topn]]
 
-    def search_videos(self, query, scroll_times=0):
+    def search_videos(self, query, scroll_times=0) -> list[Video]:
         """
         Search for videos.
 
@@ -222,21 +228,21 @@ class YTDriver:
             sleep(1)
 
             # check if ad is being shown
-            preview = self.driver.find_elements(By.CLASS_NAME, 'ytp-ad-preview-container')
-            if len(preview) == 0:
+            xpath = '//div[%s]' % (' or '.join(["@class='%s'" % i for i in YTDriver.AD_CLASSNAMES]))
+            ad_elems = self.driver.find_elements(By.XPATH, xpath)
+            if len(ad_elems) == 0:
                 self.__log('Ad not detected')
                 # ad is not shown, return
                 return
 
             self.__log('Ad detected')
             
-            sleep(1)
-            preview = preview[0]
             # an ad is being shown
             # grab preview text to determine ad type
+            preview = ad_elems[0]
             text = preview.text.replace('\n', ' ')
             wait = 0
-            if 'after ad' in text:
+            if 'after ad' in text or 'plays soon' in text:
                 # unskippable ad, grab ad length
                 length = self.driver.find_elements(By.CLASS_NAME, 'ytp-ad-duration-remaining')[0].text
                 wait = time2seconds(length)
@@ -254,7 +260,7 @@ class YTDriver:
             sleep(wait)
 
             # click skip button if available
-            skip = self.driver.find_elements(By.CLASS_NAME, 'ytp-ad-skip-button-container')
+            skip = self.driver.find_elements(By.CLASS_NAME, 'ytp-skip-ad-button')
             if len(skip) > 0:
                 skip[0].click()
 
