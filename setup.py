@@ -5,7 +5,7 @@ long_description = (Path(__file__).parent / "README.md").read_text()
 
 setup(
     name="YouTube-Driver",
-    version="1.0.7",
+    version="1.0.8",
     packages=["ytdriver"],
     license="MIT",
     author="Muhammad Haroon",
@@ -18,6 +18,7 @@ setup(
     package_dir={"": "src"},
     install_requires=[
         'selenium',
-        'pyvirtualdisplay'
+        'pyvirtualdisplay',
+        'yt-dlp'
     ]
 )
